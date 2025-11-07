@@ -1,11 +1,11 @@
 "use client";
 
-import { ReactNode, useState } from "react";
 import {
   QueryClient,
   QueryClientProvider,
   DefaultOptions,
 } from "@tanstack/react-query";
+import { ReactNode, useState } from "react";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 type Props = {

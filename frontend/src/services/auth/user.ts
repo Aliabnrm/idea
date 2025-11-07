@@ -8,7 +8,7 @@ type RegisterUserInput = {
   password: string;
 };
 
-export function useRegisterUserMutation() {
+export function useRegisterUserMutation() { 
   const queryClient = useQueryClient();
 
   return useMutation({
