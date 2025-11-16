@@ -1,15 +1,8 @@
 "use client";
-
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FormData } from "@/src/types/auth";
 import { useRouter } from "next/navigation";
-import { registerUser } from "@/src/services/loginApi";
-
-type FormData = {
-  name: string;
-  email: string;
-  password: string;
-};
+import { useRegisterUserMutation } from "@/src/services/auth/user";
 
 export default function Login() {
   const router = useRouter();
@@ -21,24 +14,15 @@ export default function Login() {
     formState: { errors },
   } = useForm<FormData>();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const registerMutation = useRegisterUserMutation();
 
   const onSubmit = async (data: FormData) => {
-    setError("");
-    setSuccess("");
-    setLoading(true);
-
     try {
-      const user = await registerUser(data);
-      setSuccess(`User ${user.name} created successfully!`);
+      await registerMutation.mutateAsync(data);
       reset();
       router.push("/");
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } catch {
+      // error handled by react-query state
     }
   };
 
@@ -52,8 +36,15 @@ export default function Login() {
           Sign Up
         </h1>
 
-        {error && <p className="text-red-500">{error}</p>}
-        {success && <p className="text-green-600">{success}</p>}
+        {registerMutation.isError && (
+          <p className="text-red-500">
+            {(registerMutation.error as Error)?.message ||
+              "Registration failed"}
+          </p>
+        )}
+        {registerMutation.isSuccess && (
+          <p className="text-green-600">Account created successfully!</p>
+        )}
 
         {/* Name */}
         <div>
@@ -116,10 +107,10 @@ export default function Login() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={registerMutation.isPending}
           className="mt-6 w-full bg-indigo-500 text-white py-2 rounded-lg cursor-pointer hover:bg-indigo-700 transition"
         >
-          {loading ? "Loading..." : "Create Account"}
+          {registerMutation.isPending ? "Loading..." : "Create Account"}
         </button>
       </form>
     </div>
