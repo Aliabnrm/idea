@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: routine
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data   
+
+  backend:
+    build: ./backend
+    ports: 
+     - "5432:5432"
+    environment:
+      DATABASE_URL: postgres://postgres:123456@db:5432/routine
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: routine
+      DB_HOST: db
+    depends_on:
+      - db
+
+volumes:
+  db_data:
